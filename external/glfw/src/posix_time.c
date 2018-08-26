@@ -32,7 +32,8 @@
 
 // Return raw time
 //
-static uint64_t getRawTime(void) {
+static uint64_t getRawTime(void)
+{
 #if defined(CLOCK_MONOTONIC)
     if (_glfw.posix_time.monotonic)
     {
@@ -58,7 +59,8 @@ static uint64_t getRawTime(void) {
 
 // Initialise timer
 //
-void _glfwInitTimer(void) {
+void _glfwInitTimer(void)
+{
 #if defined(CLOCK_MONOTONIC)
     struct timespec ts;
 
@@ -81,13 +83,15 @@ void _glfwInitTimer(void) {
 //////                       GLFW platform API                      //////
 //////////////////////////////////////////////////////////////////////////
 
-double _glfwPlatformGetTime(void) {
+double _glfwPlatformGetTime(void)
+{
     return (double) (getRawTime() - _glfw.posix_time.base) *
-           _glfw.posix_time.resolution;
+        _glfw.posix_time.resolution;
 }
 
-void _glfwPlatformSetTime(double time) {
+void _glfwPlatformSetTime(double time)
+{
     _glfw.posix_time.base = getRawTime() -
-                            (uint64_t)(time / _glfw.posix_time.resolution);
+        (uint64_t) (time / _glfw.posix_time.resolution);
 }
 

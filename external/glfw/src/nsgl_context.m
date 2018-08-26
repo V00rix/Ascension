@@ -33,13 +33,15 @@
 
 // Initialize OpenGL support
 //
-int _glfwInitContextAPI(void) {
+int _glfwInitContextAPI(void)
+{
     if (!_glfwCreateContextTLS())
         return GL_FALSE;
 
     _glfw.nsgl.framework =
-            CFBundleGetBundleWithIdentifier(CFSTR("com.apple.opengl"));
-    if (_glfw.nsgl.framework == NULL) {
+        CFBundleGetBundleWithIdentifier(CFSTR("com.apple.opengl"));
+    if (_glfw.nsgl.framework == NULL)
+    {
         _glfwInputError(GLFW_API_UNAVAILABLE,
                         "NSGL: Failed to locate OpenGL framework");
         return GL_FALSE;
@@ -50,18 +52,21 @@ int _glfwInitContextAPI(void) {
 
 // Terminate OpenGL support
 //
-void _glfwTerminateContextAPI(void) {
+void _glfwTerminateContextAPI(void)
+{
     _glfwDestroyContextTLS();
 }
 
 // Create the OpenGL context
 //
-int _glfwCreateContext(_GLFWwindow *window,
-                       const _GLFWctxconfig *ctxconfig,
-                       const _GLFWfbconfig *fbconfig) {
+int _glfwCreateContext(_GLFWwindow* window,
+                       const _GLFWctxconfig* ctxconfig,
+                       const _GLFWfbconfig* fbconfig)
+{
     unsigned int attributeCount = 0;
 
-    if (ctxconfig->api == GLFW_OPENGL_ES_API) {
+    if (ctxconfig->api == GLFW_OPENGL_ES_API)
+    {
         _glfwInputError(GLFW_API_UNAVAILABLE,
                         "NSGL: OpenGL ES is not available on OS X");
         return GL_FALSE;
@@ -93,7 +98,8 @@ int _glfwCreateContext(_GLFWwindow *window,
     }
 #else
     // Fail if OpenGL 3.0 or above was requested
-    if (ctxconfig->major > 2) {
+    if (ctxconfig->major > 2)
+    {
         _glfwInputError(GLFW_VERSION_UNAVAILABLE,
                         "NSGL: The targeted version of OS X does not support OpenGL version 3.0 or above");
         return GL_FALSE;
@@ -129,13 +135,16 @@ int _glfwCreateContext(_GLFWwindow *window,
     }
 #endif /*MAC_OS_X_VERSION_MAX_ALLOWED*/
 
-    if (ctxconfig->major <= 2) {
-        if (fbconfig->auxBuffers != GLFW_DONT_CARE) ADD_ATTR2(NSOpenGLPFAAuxBuffers, fbconfig->auxBuffers);
+    if (ctxconfig->major <= 2)
+    {
+        if (fbconfig->auxBuffers != GLFW_DONT_CARE)
+            ADD_ATTR2(NSOpenGLPFAAuxBuffers, fbconfig->auxBuffers);
 
         if (fbconfig->accumRedBits != GLFW_DONT_CARE &&
             fbconfig->accumGreenBits != GLFW_DONT_CARE &&
             fbconfig->accumBlueBits != GLFW_DONT_CARE &&
-            fbconfig->accumAlphaBits != GLFW_DONT_CARE) {
+            fbconfig->accumAlphaBits != GLFW_DONT_CARE)
+        {
             const int accumBits = fbconfig->accumRedBits +
                                   fbconfig->accumGreenBits +
                                   fbconfig->accumBlueBits +
@@ -147,7 +156,8 @@ int _glfwCreateContext(_GLFWwindow *window,
 
     if (fbconfig->redBits != GLFW_DONT_CARE &&
         fbconfig->greenBits != GLFW_DONT_CARE &&
-        fbconfig->blueBits != GLFW_DONT_CARE) {
+        fbconfig->blueBits != GLFW_DONT_CARE)
+    {
         int colorBits = fbconfig->redBits +
                         fbconfig->greenBits +
                         fbconfig->blueBits;
@@ -161,20 +171,29 @@ int _glfwCreateContext(_GLFWwindow *window,
         ADD_ATTR2(NSOpenGLPFAColorSize, colorBits);
     }
 
-    if (fbconfig->alphaBits != GLFW_DONT_CARE) ADD_ATTR2(NSOpenGLPFAAlphaSize, fbconfig->alphaBits);
+    if (fbconfig->alphaBits != GLFW_DONT_CARE)
+        ADD_ATTR2(NSOpenGLPFAAlphaSize, fbconfig->alphaBits);
 
-    if (fbconfig->depthBits != GLFW_DONT_CARE) ADD_ATTR2(NSOpenGLPFADepthSize, fbconfig->depthBits);
+    if (fbconfig->depthBits != GLFW_DONT_CARE)
+        ADD_ATTR2(NSOpenGLPFADepthSize, fbconfig->depthBits);
 
-    if (fbconfig->stencilBits != GLFW_DONT_CARE) ADD_ATTR2(NSOpenGLPFAStencilSize, fbconfig->stencilBits);
+    if (fbconfig->stencilBits != GLFW_DONT_CARE)
+        ADD_ATTR2(NSOpenGLPFAStencilSize, fbconfig->stencilBits);
 
-    if (fbconfig->stereo) ADD_ATTR(NSOpenGLPFAStereo);
+    if (fbconfig->stereo)
+        ADD_ATTR(NSOpenGLPFAStereo);
 
-    if (fbconfig->doublebuffer) ADD_ATTR(NSOpenGLPFADoubleBuffer);
+    if (fbconfig->doublebuffer)
+        ADD_ATTR(NSOpenGLPFADoubleBuffer);
 
-    if (fbconfig->samples != GLFW_DONT_CARE) {
-        if (fbconfig->samples == 0) {
+    if (fbconfig->samples != GLFW_DONT_CARE)
+    {
+        if (fbconfig->samples == 0)
+        {
             ADD_ATTR2(NSOpenGLPFASampleBuffers, 0);
-        } else {
+        }
+        else
+        {
             ADD_ATTR2(NSOpenGLPFASampleBuffers, 1);
             ADD_ATTR2(NSOpenGLPFASamples, fbconfig->samples);
         }
@@ -189,22 +208,24 @@ int _glfwCreateContext(_GLFWwindow *window,
 #undef ADD_ATTR2
 
     window->nsgl.pixelFormat =
-            [[NSOpenGLPixelFormat alloc] initWithAttributes:attributes];
-    if (window->nsgl.pixelFormat == nil) {
+        [[NSOpenGLPixelFormat alloc] initWithAttributes:attributes];
+    if (window->nsgl.pixelFormat == nil)
+    {
         _glfwInputError(GLFW_FORMAT_UNAVAILABLE,
                         "NSGL: Failed to find a suitable pixel format");
         return GL_FALSE;
     }
 
-    NSOpenGLContext *share = NULL;
+    NSOpenGLContext* share = NULL;
 
     if (ctxconfig->share)
         share = ctxconfig->share->nsgl.context;
 
     window->nsgl.context =
-            [[NSOpenGLContext alloc] initWithFormat:window->nsgl.pixelFormat
-                                       shareContext:share];
-    if (window->nsgl.context == nil) {
+        [[NSOpenGLContext alloc] initWithFormat:window->nsgl.pixelFormat
+                                   shareContext:share];
+    if (window->nsgl.context == nil)
+    {
         _glfwInputError(GLFW_VERSION_UNAVAILABLE,
                         "NSGL: Failed to create OpenGL context");
         return GL_FALSE;
@@ -215,7 +236,8 @@ int _glfwCreateContext(_GLFWwindow *window,
 
 // Destroy the OpenGL context
 //
-void _glfwDestroyContext(_GLFWwindow *window) {
+void _glfwDestroyContext(_GLFWwindow* window)
+{
     [window->nsgl.pixelFormat release];
     window->nsgl.pixelFormat = nil;
 
@@ -228,7 +250,8 @@ void _glfwDestroyContext(_GLFWwindow *window) {
 //////                       GLFW platform API                      //////
 //////////////////////////////////////////////////////////////////////////
 
-void _glfwPlatformMakeContextCurrent(_GLFWwindow *window) {
+void _glfwPlatformMakeContextCurrent(_GLFWwindow* window)
+{
     if (window)
         [window->nsgl.context makeCurrentContext];
     else
@@ -237,24 +260,28 @@ void _glfwPlatformMakeContextCurrent(_GLFWwindow *window) {
     _glfwSetContextTLS(window);
 }
 
-void _glfwPlatformSwapBuffers(_GLFWwindow *window) {
+void _glfwPlatformSwapBuffers(_GLFWwindow* window)
+{
     // ARP appears to be unnecessary, but this is future-proof
     [window->nsgl.context flushBuffer];
 }
 
-void _glfwPlatformSwapInterval(int interval) {
-    _GLFWwindow *window = _glfwPlatformGetCurrentContext();
+void _glfwPlatformSwapInterval(int interval)
+{
+    _GLFWwindow* window = _glfwPlatformGetCurrentContext();
 
     GLint sync = interval;
     [window->nsgl.context setValues:&sync forParameter:NSOpenGLCPSwapInterval];
 }
 
-int _glfwPlatformExtensionSupported(const char *extension) {
+int _glfwPlatformExtensionSupported(const char* extension)
+{
     // There are no NSGL extensions
     return GL_FALSE;
 }
 
-GLFWglproc _glfwPlatformGetProcAddress(const char *procname) {
+GLFWglproc _glfwPlatformGetProcAddress(const char* procname)
+{
     CFStringRef symbolName = CFStringCreateWithCString(kCFAllocatorDefault,
                                                        procname,
                                                        kCFStringEncodingASCII);
@@ -272,8 +299,9 @@ GLFWglproc _glfwPlatformGetProcAddress(const char *procname) {
 //////                        GLFW native API                       //////
 //////////////////////////////////////////////////////////////////////////
 
-GLFWAPI id glfwGetNSGLContext(GLFWwindow *handle) {
-    _GLFWwindow *window = (_GLFWwindow *) handle;
+GLFWAPI id glfwGetNSGLContext(GLFWwindow* handle)
+{
+    _GLFWwindow* window = (_GLFWwindow*) handle;
     _GLFW_REQUIRE_INIT_OR_RETURN(nil);
     return window->nsgl.context;
 }

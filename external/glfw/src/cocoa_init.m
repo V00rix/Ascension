@@ -25,6 +25,7 @@
 //========================================================================
 
 #include "internal.h"
+#include <sys/param.h> // For MAXPATHLEN
 
 
 #if defined(_GLFW_USE_CHDIR)
@@ -69,7 +70,8 @@ static void changeToResourcesDirectory(void)
 
 // Create key code translation tables
 //
-static void createKeyTables(void) {
+static void createKeyTables(void)
+{
     memset(_glfw.ns.publicKeys, -1, sizeof(_glfw.ns.publicKeys));
 
     _glfw.ns.publicKeys[0x1D] = GLFW_KEY_0;
@@ -193,7 +195,8 @@ static void createKeyTables(void) {
 //////                       GLFW platform API                      //////
 //////////////////////////////////////////////////////////////////////////
 
-int _glfwPlatformInit(void) {
+int _glfwPlatformInit(void)
+{
     _glfw.ns.autoreleasePool = [[NSAutoreleasePool alloc] init];
 
 #if defined(_GLFW_USE_CHDIR)
@@ -217,13 +220,16 @@ int _glfwPlatformInit(void) {
     return GL_TRUE;
 }
 
-void _glfwPlatformTerminate(void) {
-    if (_glfw.ns.eventSource) {
+void _glfwPlatformTerminate(void)
+{
+    if (_glfw.ns.eventSource)
+    {
         CFRelease(_glfw.ns.eventSource);
         _glfw.ns.eventSource = NULL;
     }
 
-    if (_glfw.ns.delegate) {
+    if (_glfw.ns.delegate)
+    {
         [NSApp setDelegate:nil];
         [_glfw.ns.delegate release];
         _glfw.ns.delegate = nil;
@@ -241,7 +247,8 @@ void _glfwPlatformTerminate(void) {
     _glfwTerminateContextAPI();
 }
 
-const char *_glfwPlatformGetVersionString(void) {
+const char* _glfwPlatformGetVersionString(void)
+{
     return _GLFW_VERSION_NUMBER " Cocoa"
 #if defined(_GLFW_NSGL)
         " NSGL"
@@ -258,6 +265,6 @@ const char *_glfwPlatformGetVersionString(void) {
 #if defined(_GLFW_BUILD_DLL)
         " dynamic"
 #endif
-            ;
+        ;
 }
 
